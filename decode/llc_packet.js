@@ -1,6 +1,7 @@
 var IPv4 = require("./ipv4");
 var IPv6 = require("./ipv6");
 var ARP = require("./arp");
+var packet_plugins = require("./llc_packet_plugins");
 
 function LogicalLinkControl(emitter) {
     this.emitter = emitter;
@@ -44,6 +45,12 @@ LogicalLinkControl.prototype.decode = function (raw_packet, offset) {
             case 0x86dd: // IPv6
                 this.payload = new IPv6(this.emitter).decode(raw_packet, offset);
                 break;
+            default:
+                var Plugin = packet_plugins[this.type]
+                if (Plugin) {
+                    this.payload = new Plugin(this.emitter).decode(raw_packet, offset);
+                }
+                break; 
             }
         }
     } else {
