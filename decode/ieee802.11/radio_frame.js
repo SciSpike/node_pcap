@@ -69,6 +69,9 @@ RadioFrame.prototype.decode = function (raw_packet, offset) {
         }
 
     } else if (this.type === 2) { // Data Frame
+        if(this.subType == 8) {
+          this.qos = raw_packet.readUInt16LE(offset, true); offset += 2;
+        }
         if (!this.flags.encrypted && this.subType !== 36) { // subType 36 is a null data frame
             this.llc = new LogicalLinkControl(this.emitter).decode(raw_packet, offset);
         }
